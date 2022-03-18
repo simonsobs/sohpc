@@ -1,0 +1,45 @@
+#!/bin/bash
+
+pkg="so3g"
+version=c3d0b4ca9418b05aac1e5faf7ab5b21f2b10481b
+psrc=${pkg}-${version}
+pfile=${psrc}.tar.gz
+
+fetched=$(eval "@TOP_DIR@/tools/fetch_check.sh" https://github.com/simonsobs/so3g/archive/${version}.tar.gz ${pfile})
+
+if [ "x${fetched}" = "x" ]; then
+    echo "Failed to fetch ${pkg}" >&2
+    exit 1
+fi
+
+log="../../log_${pkg}"
+
+echo "Building ${pkg}..." >&2
+
+rm -rf ${psrc}
+tar xzf ${fetched} \
+    && cd ${psrc} \
+    && patch -p1 < "@TOP_DIR@/pkgs/12_so3g.sh.patch" > ${log} 2>&1 \
+    && mkdir build \
+    && cd build \
+    && cmake \
+    -DCMAKE_PREFIX_PATH=${CMBENV_AUX_ROOT}/spt3g/build \
+    -DCMAKE_C_COMPILER="@CC@" \
+    -DCMAKE_CXX_COMPILER="@CXX@" \
+    -DCMAKE_C_FLAGS="@CFLAGS@" \
+    -DCMAKE_CXX_FLAGS="@CXXFLAGS@" \
+    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+    -DPYTHON_EXECUTABLE=$(which python3) \
+    -DBLAS_LIBRARIES="${CMBENV_AUX_ROOT}/lib/libopenblas.a" \
+    -DCMAKE_INSTALL_PREFIX="@PREFIX@" \
+    -DPYTHON_INSTALL_DEST="@PREFIX@/lib/python@PYVERSION@/site-packages" \
+    .. >> ${log} 2>&1 \
+    && make -j @MAKEJ@ install >> ${log} 2>&1
+
+if [ $? -ne 0 ]; then
+    echo "Failed to build ${pkg}" >&2
+    exit 1
+fi
+
+echo "Finished building ${pkg}" >&2
+exit 0

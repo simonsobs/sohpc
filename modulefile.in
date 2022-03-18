@@ -1,0 +1,22 @@
+#%Module###<-magic cookie ####################################################
+##
+##   Simons Observatory Software Stack.
+##
+##
+# variables for Tcl script use only
+set     version  @VERSION@
+
+module-whatis "Loads software for the Simons Observatory."
+
+proc ModulesHelp { } {
+  global version
+  puts stderr "\t\t S.O. Software Stack - Version $version\n"
+  puts stderr ""
+}
+
+conflict so-env
+
+@modload@
+
+# Environment modifications
+prepend-path PATH "@PREFIX@/bin"

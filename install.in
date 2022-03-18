@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Create install prefix.
+
+mkdir -p "@PREFIX@/bin"
+mkdir -p "@PREFIX@/lib"
+mkdir -p "@PREFIX@/include"
+mkdir -p "@PREFIX@/lib/python@PYVERSION@/site-packages"
+pushd "@PREFIX@" > /dev/null 2>&1
+if [ ! -e lib64 ]; then
+    ln -s lib lib64
+fi
+popd > /dev/null 2>&1
+
+# Create the activation script and source it
+
+eval "@TOP_DIR@/tools/gen_activate.sh" "@VERSION@" "@PREFIX@" "@PYVERSION@"
+source "@PREFIX@/bin/so-env"
+
+# Install packages
+
+@PACKAGES@
+
+# Compile python modules
+
+echo "Compiling python packages..."
+python3 -m compileall -f "@PREFIX@" > log_pycompile
+
+# Install environment init file
+
+cp "$0.init" "@PREFIX@/so_env_init.sh"
+
+# Install modulefile
+
+if [ "x@MODULE_DIR@" != "x" ]; then
+    mkdir -p "@MODULE_DIR@"
+    cp "$0.mod" "@MODULE_DIR@/@VERSION@"
+    cp "$0.modver" "@MODULE_DIR@/.version_@VERSION@"
+fi
+
+# Install logo
+
+cp "@TOP_DIR@"/logo-*.png "@PREFIX@/"
+
+# Create a launcher script for jupyter
+kern="@PREFIX@/bin/so_env_run_kernel.sh"
+echo "#!/bin/bash" > "${kern}"
+echo "conn=\$1" >> "${kern}"
+echo "source \"@PREFIX@/so_env_init.sh\"" >> "${kern}"
+echo "source \"@PREFIX@/bin/so-env\"" >> "${kern}"
+echo "export DISABLE_MPI=true" >> "${kern}"
+echo "exec python3 -m ipykernel -f \${conn}" >> "${kern}"
+chmod +x "${kern}"
+
+# Set permissions
+
+if [ "x@CHGRP@" != "x" ]; then
+    chgrp -R @CHGRP@ "@PREFIX@"
+fi
+
+if [ "x@CHMOD@" != "x" ]; then
+    chmod -R @CHMOD@ "@PREFIX@"
+fi

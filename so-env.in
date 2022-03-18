@@ -1,0 +1,65 @@
+# This file must be used with "source so-env" *from bash*
+# You cannot run it directly.
+
+so-env-deactivate () {
+    unset SO_ENV_ROOT
+}
+
+so-env-jupyter () {
+    kerneldir=${HOME}/.local/share/jupyter/kernels/so-env-@VERSION@
+    if [ -d ${kerneldir} ]; then
+        echo "so-env @VERSION@ is already installed in ${kerneldir}, skipping." >&2
+        return 1
+    else
+        echo "so-env installing kernel version @VERSION@ to ${kerneldir}"
+    fi
+    mkdir -p "${kerneldir}"
+    echo '
+    {
+     "language": "python",
+     "argv": [
+      "@PREFIX@/bin/so_env_run_kernel.sh",
+      "{connection_file}"
+     ],
+     "display_name": "Simons Observatory @VERSION@"
+    }
+    ' > "${kerneldir}/kernel.json"
+    cp "@PREFIX@"/logo-*.png "${kerneldir}/"
+    return 0
+}
+
+source cmbenv
+
+export SO_ENV_ROOT="@PREFIX@"
+
+if [ "x${NERSC_HOST}" != "x" ]; then
+    export DOT_MOBY2=/global/project/projectdirs/sobs/users/mhasse/dot_moby2
+    export SOTODLIB_SITECONFIG=/global/project/projectdirs/sobs/users/mhasse/site.yaml
+fi
+
+so_env_prepend_env () {
+    # This function is needed since trailing colons
+    # on some environment variables can cause major
+    # problems...
+    local envname=$1
+    local envval=$2
+    if [ "x${!envname}" = "x" ]; then
+        export ${envname}="${envval}"
+    else
+        export ${envname}="${envval}":${!envname}
+    fi
+}
+
+so_env_prepend_env "PATH" "@PREFIX@/bin"
+so_env_prepend_env "CPATH" "@PREFIX@/include"
+so_env_prepend_env "LIBRARY_PATH" "@PREFIX@/lib"
+so_env_prepend_env "LD_LIBRARY_PATH" "@PREFIX@/lib"
+so_env_prepend_env "PYTHONPATH" "@PREFIX@/lib/python@PYVERSION@/site-packages"
+so_env_prepend_env "PKG_CONFIG_PATH" "@PREFIX@/lib/pkgconfig"
+
+# This should detect bash and zsh, which have a hash command that must
+# be called to get it to forget past commands.  Without forgetting
+# past commands the $PATH changes we made may not be respected
+if [ -n "${BASH-}" ] || [ -n "${ZSH_VERSION-}" ] ; then
+    hash -r 2>/dev/null
+fi
