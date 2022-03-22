@@ -14,7 +14,7 @@ proc ModulesHelp { } {
   puts stderr ""
 }
 
-conflict so-env
+conflict sohpc so-env
 
 @modload@
 
