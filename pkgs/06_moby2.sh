@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pkg="moby2"
-version=dc1707c44824b06f604f4fdb6dce30fa84174b28
+version=fd360a7352c88d3eb5195f5f0ea331ddc24e5e09
 psrc=${pkg}-${version}
 pfile=${psrc}.tar.gz
 
@@ -12,7 +12,11 @@ if [ "x${fetched}" = "x" ]; then
     exit 1
 fi
 
-log="../log_${pkg}"
+if [ "@DOCKER@" = "yes" ]; then
+    log=/dev/stderr
+else
+    log="../log_${pkg}"
+fi
 
 echo "Building ${pkg}..." >&2
 

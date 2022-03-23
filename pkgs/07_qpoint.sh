@@ -4,7 +4,11 @@ pkg="qpoint"
 version=828126de9f195f88bfaf1996527f633382457461
 psrc=${pkg}-${version}
 
-log="../log_${pkg}"
+if [ "@DOCKER@" = "yes" ]; then
+    log=/dev/stderr
+else
+    log="../log_${pkg}"
+fi
 
 echo "Building ${pkg}..." >&2
 

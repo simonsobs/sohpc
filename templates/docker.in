@@ -1,0 +1,51 @@
+FROM @DOCKER_BASE@ as builder
+
+MAINTAINER Theodore Kisner <tskisner@lbl.gov>
+
+# Use bash
+
+SHELL ["/bin/bash", "-c"]
+
+# The cmbenv home directory is already set
+
+WORKDIR /home/cmbenv
+
+# Copy files into place
+
+RUN mkdir -p /home/cmbenv/Dockerfile_@CONFIG@_pkgs
+COPY Dockerfile_@CONFIG@_pkgs /home/cmbenv/Dockerfile_@CONFIG@_pkgs/
+
+RUN mkdir -p /home/cmbenv/tools
+COPY tools /home/cmbenv/tools/
+
+RUN mkdir -p /home/cmbenv/pkgs
+COPY pkgs /home/cmbenv/pkgs/
+
+RUN mkdir -p /home/cmbenv/templates
+COPY templates /home/cmbenv/templates/
+
+RUN mkdir -p /home/cmbenv/configs
+COPY configs /home/cmbenv/configs/
+
+COPY sohpc_setup.sh /home/cmbenv/
+
+# Install packages
+
+@PACKAGES@
+
+# Precompile all python modules
+
+RUN python3 -m compileall -q "@PREFIX@/lib/python@PYVERSION@/site-packages" -x ".*jinja.*"
+
+# ======================================
+
+FROM @DOCKER_BASE@
+
+# Copy our installed software binaries and libraries.
+# NOTE:  The "RUN true" commands work around a docker bug:
+#   https://github.com/moby/moby/issues/37965
+#
+
+COPY --from=builder /usr/local /usr/local/
+RUN true
+

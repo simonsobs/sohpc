@@ -1,0 +1,27 @@
+# Specify the docker base image
+
+DOCKER_BASE = hpc4cmb/cmbenv-mpich:1.2.1
+
+# Serial compilers
+
+CC = gcc
+CXX = g++
+FC = gfortran
+
+# Compile flags
+
+CFLAGS = -O3 -fPIC -pthread
+CXXFLAGS = -O3 -fPIC -pthread -std=c++11
+FCFLAGS = -O3 -fPIC -pthread -fallow-argument-mismatch
+
+OPENMP_CFLAGS = -fopenmp
+OPENMP_CXXFLAGS = -fopenmp
+LDFLAGS = -lpthread -fopenmp
+
+# Parallel builds
+MAKEJ = 2
+
+# Group and permissions to set
+
+CHGRP =
+CHMOD =

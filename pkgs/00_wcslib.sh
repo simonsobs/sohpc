@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pkg="wcslib"
-version=7.6
+version=7.7
 psrc=${pkg}-${version}
 pfile=${psrc}.tar.bz2
 
@@ -12,7 +12,11 @@ if [ "x${fetched}" = "x" ]; then
     exit 1
 fi
 
-log="../log_${pkg}"
+if [ "@DOCKER@" = "yes" ]; then
+    log=/dev/stderr
+else
+    log="../log_${pkg}"
+fi
 
 echo "Building ${pkg}..." >&2
 

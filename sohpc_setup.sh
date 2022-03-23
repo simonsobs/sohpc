@@ -95,9 +95,12 @@ popd > /dev/null
 
 conf_file="${topdir}/configs/${config}"
 
-script="install_${config}"
-
-eval "${topdir}/tools/gen_script.sh" "install.in" "${conf_file}" \
-    "${script}" "${prefix}" "${version}" "${moduledir}"
+if [ "${is_docker}" = "yes" ]; then
+    eval "${topdir}/tools/gen_script.sh" "docker.in" "${config}" "${conf_file}" \
+        "Dockerfile_${config}" "/usr/local" "${version}" "${moduledir}" "${is_docker}"
+else
+    eval "${topdir}/tools/gen_script.sh" "install.in" "${config}" "${conf_file}" \
+        "install_${config}" "${prefix}" "${version}" "${moduledir}" "${is_docker}"
+fi
 
 exit 0

@@ -4,15 +4,17 @@
 templatefile=$1
 
 # The config file definitions and package list
-conffile=$2
+config=$2
+conffile=$3
 
 # The output root of the install script
-outroot=$3
+outroot=$4
 
 # Runtime options
-prefix=$4
-version=$5
-moddir=$6
+prefix=$5
+version=$6
+moddir=$7
+docker=$8
 
 # Top level directory
 pushd $(dirname $0) > /dev/null
@@ -39,6 +41,7 @@ mkdir -p "${outpkg}"
 # Create list of variable substitutions from the input config file
 
 confsub="-e 's#@CONFFILE@#${conffile}#g'"
+confsub="${confsub} -e 's#@CONFIG@#${config}#g'"
 
 # Get the major / minor python version
 pyver=$(python3 --version 2>&1 | awk '{print $2}' | sed -e "s#\(.*\)\.\(.*\)\..*#\1.\2#")
@@ -70,6 +73,15 @@ confsub="${confsub} -e 's#@VERSION@#${version}#g'"
 confsub="${confsub} -e 's#@MODULE_DIR@#${module_dir}#g'"
 confsub="${confsub} -e 's#@TOP_DIR@#${topdir}#g'"
 
+# If we are using docker, then the package scripts need to be able to find
+# the tools that we have copied into the container.
+if [ "x${docker}" = "xyes" ]; then
+    confsub="${confsub} -e 's#@TOP_DIR@#/home/cmbenv#g'"
+else
+    confsub="${confsub} -e 's#@TOP_DIR@#${topdir}#g'"
+fi
+confsub="${confsub} -e 's#@DOCKER@#${docker}#g'"
+
 # Build up the lines to run the per-package install scripts.
 
 pkgcom=""
@@ -85,8 +97,16 @@ for pkgfile in $(ls ${topdir}/pkgs | grep -e '\.sh$'); do
         cp -a "${topdir}/pkgs/${pkgfile}.patch" "${topdir}/${outpkg}/"
     fi
 
-    pcom="${topdir}/${outpkg}/${pkgfile}; if [ \$? -ne 0 ]; then echo \"FAILED\"; exit 1; fi"
-    pkgcom+="${pcom}"$'\n'$'\n'
+    if [ "x${docker}" = "xyes" ]; then
+        # Since we are usually doing a 2-stage docker build, we do not need to purge
+        # source / build artifacts that will not be copied.  This also helps
+        # debugging.
+        pcom="RUN ./${outpkg}/${pkgfile}; if [ \$? -ne 0 ]; then echo \"FAILED\"; exit 1; fi"
+        pkgcom+="${pcom}"$'\n'$'\n'
+    else
+        pcom="${topdir}/${outpkg}/${pkgfile}; if [ \$? -ne 0 ]; then echo \"FAILED\"; exit 1; fi"
+        pkgcom+="${pcom}"$'\n'$'\n'
+    fi
 done
 
 # Now process the input template, substituting the list of package install

@@ -1,18 +1,22 @@
 #!/bin/bash
 
 pkg="gsl"
-version=2.6
+version=2.7.1
 psrc=${pkg}-${version}
 pfile=${psrc}.tar.gz
 
-fetched=$(eval "@TOP_DIR@/tools/fetch_check.sh" ftp://ftp.gnu.org/gnu/gsl/${pfile} ${pfile})
+fetched=$(eval "@TOP_DIR@/tools/fetch_check.sh" https://ftpmirror.gnu.org/gsl/${pfile} ${pfile})
 
 if [ "x${fetched}" = "x" ]; then
     echo "Failed to fetch ${pkg}" >&2
     exit 1
 fi
 
-log="../log_${pkg}"
+if [ "@DOCKER@" = "yes" ]; then
+    log=/dev/stderr
+else
+    log="../log_${pkg}"
+fi
 
 echo "Building ${pkg}..." >&2
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pkg="sotodlib"
-version=7deee25e3d86be67febc4dff812e86390a186d13
+version=89e865e172ee6720b63710ea15f2f644148ef11c
 psrc=${pkg}-${version}
 pfile=${psrc}.tar.gz
 
@@ -12,7 +12,11 @@ if [ "x${fetched}" = "x" ]; then
     exit 1
 fi
 
-log="../log_${pkg}"
+if [ "@DOCKER@" = "yes" ]; then
+    log=/dev/stderr
+else
+    log="../log_${pkg}"
+fi
 
 echo "Building ${pkg}..." >&2
 
