@@ -15,7 +15,7 @@ fi
 if [ "@DOCKER@" = "yes" ]; then
     log=/dev/stderr
 else
-    log="../log_${pkg}"
+    log="../../log_${pkg}"
 fi
 
 echo "Building ${pkg}..." >&2

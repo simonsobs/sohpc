@@ -5,9 +5,9 @@ on clusters / HPC systems.  These scripts rely on a base installation of the
 `cmbenv` software stack (https://github.com/hpc4cmb/cmbenv).  Before building these
 packages, first load that environment.
 
-If you are just installing Simons Observatory tools on a laptop or workstation,
-it is probably easier to create a python virtualenv and use pip to install
-everything.
+If you are installing Simons Observatory tools on a laptop or workstation, and are
+not developing the `so3g` package or its dependencies, then it is likely easier to
+create a python virtualenv and use pip to install everything.
 
 ## Docker Containers
 
@@ -18,7 +18,9 @@ There are containers built with both MPICH and OpenMPI.  You should use the one
 which is compatible with the MPI version on your system.  Most HPC centers that
 support container solutions will inject / mount the system libraries (including
 MPI) into user containers when they are launched.  This makes it critical to
-use a container that includes an ABI compatible MPI implementation.
+use a container that includes an ABI compatible MPI implementation.  For example,
+on the Cray systems at NERSC, you should use the MPICH flavor of the container when
+using shifter
 
 
 ## Generate the Install Script
