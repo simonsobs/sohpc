@@ -11,7 +11,7 @@ show_help () {
     echo "" >&2
     echo "    The name of the config and the install prefix are required." >&2
     echo "    If a version string is not specified, the current git version" >&2
-    echo "    of the pwg-scripts repository is used." >&2
+    echo "    of this repository is used." >&2
     echo "" >&2
     echo "" >&2
 }
@@ -50,27 +50,42 @@ if [ "x${config}" = "x" ]; then
     exit 1
 fi
 
+is_docker="no"
+if [[ ${config} =~ .*docker.* ]]; then
+    is_docker="yes"
+fi
+
 if [ "x${prefix}" = "x" ]; then
-    show_help
-    exit 1
+    if [ "${is_docker}" = "no" ]; then
+        show_help
+        exit 1
+    else
+        prefix="NONE"
+    fi
 fi
 
 if [ "x${version}" == "x" ]; then
-    if [ "x$(which git)" = "x" ]; then
-        echo "No version specified and git not available"
-        exit 1
+    if [ "${is_docker}" = "no" ]; then
+        if [ "x$(which git)" = "x" ]; then
+            echo "No version specified and git not available"
+            exit 1
+        fi
+        gitdesc=$(git describe --tags --dirty --always | cut -d "-" -f 1)
+        gitcnt=$(git rev-list --count HEAD)
+        version="${gitdesc}.dev${gitcnt}"
+    else
+        version="none"
     fi
-    gitdesc=$(git describe --tags --dirty --always | cut -d "-" -f 1)
-    gitcnt=$(git rev-list --count HEAD)
-    version="${gitdesc}.dev${gitcnt}"
 fi
 
 moduledir="${prefix}/modulefiles"
 
 # These tools assume that cmbenv is already loaded
-if [ "x${CMBENV_ROOT}" = "x" ]; then
-    echo "Load the cmbenv tools before running this script."
-    exit 1
+if [ "${is_docker}" = "no" ]; then
+    if [ "x${CMBENV_ROOT}" = "x" ]; then
+        echo "Load the cmbenv tools before running this script."
+        exit 1
+    fi
 fi
 
 # get the absolute path to the directory with this script

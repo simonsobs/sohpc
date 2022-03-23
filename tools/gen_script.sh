@@ -59,7 +59,7 @@ done < "${conffile}"
 # We add these predefined matches at the end- so that the config
 # file can actually use these as well.
 
-module_dir="${moddir}/so-env"
+module_dir="${moddir}/sohpc"
 
 confsub="${confsub} -e 's#@SRCDIR@#${topdir}#g'"
 confsub="${confsub} -e 's#@PREFIX@#${prefix}#g'"
@@ -120,11 +120,11 @@ while IFS='' read -r line || [[ -n "${line}" ]]; do
 done < "${topdir}/version.in"
 
 echo "# Source this file from a Bourne-compatible shell to load" > "${outinit}"
-echo "# this so_env installation into your environment:" >> "${outinit}"
+echo "# this sohpc installation into your environment:" >> "${outinit}"
 echo "#" >> "${outinit}"
-echo "#   %>  . path/to/so_env_init.sh" >> "${outinit}"
+echo "#   %>  . path/to/sohpc_init.sh" >> "${outinit}"
 echo "#" >> "${outinit}"
-echo "# Then do \"source so-env\" as usual." >> "${outinit}"
+echo "# Then do \"source sohpc\" as usual." >> "${outinit}"
 echo "#" >> "${outinit}"
 echo "if [ \"x\${CMBENV_ROOT}\" = x ]; then" >> "${outinit}"
 echo "  source ${CMBENV_ROOT}/cmbenv_init.sh" >> "${outinit}"

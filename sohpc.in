@@ -1,24 +1,24 @@
-# This file must be used with "source so-env" *from bash*
+# This file must be used with "source sohpc" *from bash*
 # You cannot run it directly.
 
-so-env-deactivate () {
+sohpc-deactivate () {
     unset SO_ENV_ROOT
 }
 
-so-env-jupyter () {
-    kerneldir=${HOME}/.local/share/jupyter/kernels/so-env-@VERSION@
+sohpc-jupyter () {
+    kerneldir=${HOME}/.local/share/jupyter/kernels/sohpc-@VERSION@
     if [ -d ${kerneldir} ]; then
-        echo "so-env @VERSION@ is already installed in ${kerneldir}, skipping." >&2
+        echo "sohpc @VERSION@ is already installed in ${kerneldir}, skipping." >&2
         return 1
     else
-        echo "so-env installing kernel version @VERSION@ to ${kerneldir}"
+        echo "sohpc installing kernel version @VERSION@ to ${kerneldir}"
     fi
     mkdir -p "${kerneldir}"
     echo '
     {
      "language": "python",
      "argv": [
-      "@PREFIX@/bin/so_env_run_kernel.sh",
+      "@PREFIX@/bin/sohpc_run_kernel.sh",
       "{connection_file}"
      ],
      "display_name": "Simons Observatory @VERSION@"
@@ -37,7 +37,7 @@ if [ "x${NERSC_HOST}" != "x" ]; then
     export SOTODLIB_SITECONFIG=/global/project/projectdirs/sobs/users/mhasse/site.yaml
 fi
 
-so_env_prepend_env () {
+sohpc_prepend_env () {
     # This function is needed since trailing colons
     # on some environment variables can cause major
     # problems...
@@ -50,12 +50,12 @@ so_env_prepend_env () {
     fi
 }
 
-so_env_prepend_env "PATH" "@PREFIX@/bin"
-so_env_prepend_env "CPATH" "@PREFIX@/include"
-so_env_prepend_env "LIBRARY_PATH" "@PREFIX@/lib"
-so_env_prepend_env "LD_LIBRARY_PATH" "@PREFIX@/lib"
-so_env_prepend_env "PYTHONPATH" "@PREFIX@/lib/python@PYVERSION@/site-packages"
-so_env_prepend_env "PKG_CONFIG_PATH" "@PREFIX@/lib/pkgconfig"
+sohpc_prepend_env "PATH" "@PREFIX@/bin"
+sohpc_prepend_env "CPATH" "@PREFIX@/include"
+sohpc_prepend_env "LIBRARY_PATH" "@PREFIX@/lib"
+sohpc_prepend_env "LD_LIBRARY_PATH" "@PREFIX@/lib"
+sohpc_prepend_env "PYTHONPATH" "@PREFIX@/lib/python@PYVERSION@/site-packages"
+sohpc_prepend_env "PKG_CONFIG_PATH" "@PREFIX@/lib/pkgconfig"
 
 # This should detect bash and zsh, which have a hash command that must
 # be called to get it to forget past commands.  Without forgetting

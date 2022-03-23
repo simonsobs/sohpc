@@ -15,7 +15,7 @@ popd > /dev/null 2>&1
 # Create the activation script and source it
 
 eval "@TOP_DIR@/tools/gen_activate.sh" "@VERSION@" "@PREFIX@" "@PYVERSION@"
-source "@PREFIX@/bin/so-env"
+source "@PREFIX@/bin/sohpc"
 
 # Install packages
 
@@ -28,7 +28,7 @@ python3 -m compileall -f "@PREFIX@" > log_pycompile
 
 # Install environment init file
 
-cp "$0.init" "@PREFIX@/so_env_init.sh"
+cp "$0.init" "@PREFIX@/sohpc_init.sh"
 
 # Install modulefile
 
@@ -43,11 +43,11 @@ fi
 cp "@TOP_DIR@"/logo-*.png "@PREFIX@/"
 
 # Create a launcher script for jupyter
-kern="@PREFIX@/bin/so_env_run_kernel.sh"
+kern="@PREFIX@/bin/sohpc_run_kernel.sh"
 echo "#!/bin/bash" > "${kern}"
 echo "conn=\$1" >> "${kern}"
-echo "source \"@PREFIX@/so_env_init.sh\"" >> "${kern}"
-echo "source \"@PREFIX@/bin/so-env\"" >> "${kern}"
+echo "source \"@PREFIX@/sohpc_init.sh\"" >> "${kern}"
+echo "source \"@PREFIX@/bin/sohpc\"" >> "${kern}"
 echo "export DISABLE_MPI=true" >> "${kern}"
 echo "exec python3 -m ipykernel -f \${conn}" >> "${kern}"
 chmod +x "${kern}"

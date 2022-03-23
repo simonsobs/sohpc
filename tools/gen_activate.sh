@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The current so-env version
+# The current sohpc version
 version=$1
 
 # The install prefix
@@ -15,7 +15,7 @@ topdir=$(dirname $(pwd))
 popd > /dev/null 2>&1
 
 # The outputs
-outfile="${prefix}/bin/so-env"
+outfile="${prefix}/bin/sohpc"
 rm -f "${outfile}"
 
 # Create list of variable substitutions to apply
@@ -28,4 +28,4 @@ confsub="${confsub} -e 's#@PYVERSION@#${pyversion}#g'"
 
 while IFS='' read -r line || [[ -n "${line}" ]]; do
     echo "${line}" | eval sed ${confsub} >> "${outfile}"
-done < "${topdir}/so-env.in"
+done < "${topdir}/sohpc.in"
