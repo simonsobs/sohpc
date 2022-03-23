@@ -52,17 +52,17 @@ source ${HOME}/simons_obs/so_env_init.sh
 OR with modules
 ```bash
 module use ${HOME}/simons_obs/modulefiles
-module load so-env
+module load sohpc
 ```
 
 And finally, source the activation script:
 ```bash
-source so-env
+source sohpc
 ```
 
 ## Installing a Jupyter Kernel
 
 After you have loaded the environment, you can install a jupyter kernel with:
 ```bash
-so-env-jupyter
+sohpc-jupyter
 ```

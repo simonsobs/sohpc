@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This is (for example) install.in
-template=$1
+templatefile=$1
 
 # The config file definitions and package list
 conffile=$2
@@ -18,6 +18,9 @@ moddir=$6
 pushd $(dirname $0) > /dev/null
 topdir=$(dirname $(pwd))
 popd > /dev/null
+
+# Input template
+template="${topdir}/templates/${templatefile}"
 
 # The outputs
 outfile="${outroot}.sh"
@@ -113,11 +116,11 @@ while IFS='' read -r line || [[ -n "${line}" ]]; do
     else
         echo "${line}" | eval sed ${confsub} >> "${outmod}"
     fi
-done < "${topdir}/modulefile.in"
+done < "${topdir}/templates/modulefile.in"
 
 while IFS='' read -r line || [[ -n "${line}" ]]; do
     echo "${line}" | eval sed ${confsub} >> "${outmodver}"
-done < "${topdir}/version.in"
+done < "${topdir}/templates/version.in"
 
 echo "# Source this file from a Bourne-compatible shell to load" > "${outinit}"
 echo "# this sohpc installation into your environment:" >> "${outinit}"

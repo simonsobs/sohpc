@@ -7,7 +7,7 @@ show_help () {
     echo "    -p <prefix>" >&2
     echo "    [-v <version>]" >&2
     echo "" >&2
-    echo "    Generate an install script" >&2
+    echo "    Generate an install script or dockerfile." >&2
     echo "" >&2
     echo "    The name of the config and the install prefix are required." >&2
     echo "    If a version string is not specified, the current git version" >&2

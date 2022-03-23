@@ -28,4 +28,4 @@ confsub="${confsub} -e 's#@PYVERSION@#${pyversion}#g'"
 
 while IFS='' read -r line || [[ -n "${line}" ]]; do
     echo "${line}" | eval sed ${confsub} >> "${outfile}"
-done < "${topdir}/sohpc.in"
+done < "${topdir}/templates/sohpc.in"
