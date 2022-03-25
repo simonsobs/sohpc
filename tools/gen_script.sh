@@ -25,7 +25,11 @@ popd > /dev/null
 template="${topdir}/templates/${templatefile}"
 
 # The outputs
-outfile="${outroot}.sh"
+if [ "x${docker}" = "xyes" ]; then
+    outfile="${outroot}"
+else
+    outfile="${outroot}.sh"
+fi
 outmod="${outfile}.mod"
 outmodver="${outfile}.modver"
 outinit="${outfile}.init"
@@ -124,32 +128,34 @@ chmod +x "${outfile}"
 # Finally, create the module file and module version file for this config.
 # Also create a shell snippet that can be sourced.
 
-while IFS='' read -r line || [[ -n "${line}" ]]; do
-    if [[ "${line}" =~ @modload@ ]]; then
-        echo "module use ${CMBENV_ROOT}/modulefiles" >> "${outmod}"
-        echo "if [ module-info mode load ] {" >> "${outmod}"
-        echo "  if [ is-loaded cmbenv ] {" >> "${outmod}"
-        echo "  } else {" >> "${outmod}"
-        echo "    module load cmbenv" >> "${outmod}"
-        echo "  }" >> "${outmod}"
-        echo "}" >> "${outmod}"
-    else
-        echo "${line}" | eval sed ${confsub} >> "${outmod}"
-    fi
-done < "${topdir}/templates/modulefile.in"
+if [ "x${docker}" != "xyes" ]; then
+    while IFS='' read -r line || [[ -n "${line}" ]]; do
+        if [[ "${line}" =~ @modload@ ]]; then
+            echo "module use ${CMBENV_ROOT}/modulefiles" >> "${outmod}"
+            echo "if [ module-info mode load ] {" >> "${outmod}"
+            echo "  if [ is-loaded cmbenv ] {" >> "${outmod}"
+            echo "  } else {" >> "${outmod}"
+            echo "    module load cmbenv" >> "${outmod}"
+            echo "  }" >> "${outmod}"
+            echo "}" >> "${outmod}"
+        else
+            echo "${line}" | eval sed ${confsub} >> "${outmod}"
+        fi
+    done < "${topdir}/templates/modulefile.in"
 
-while IFS='' read -r line || [[ -n "${line}" ]]; do
-    echo "${line}" | eval sed ${confsub} >> "${outmodver}"
-done < "${topdir}/templates/version.in"
+    while IFS='' read -r line || [[ -n "${line}" ]]; do
+        echo "${line}" | eval sed ${confsub} >> "${outmodver}"
+    done < "${topdir}/templates/version.in"
 
-echo "# Source this file from a Bourne-compatible shell to load" > "${outinit}"
-echo "# this sohpc installation into your environment:" >> "${outinit}"
-echo "#" >> "${outinit}"
-echo "#   %>  . path/to/sohpc_init.sh" >> "${outinit}"
-echo "#" >> "${outinit}"
-echo "# Then do \"source sohpc\" as usual." >> "${outinit}"
-echo "#" >> "${outinit}"
-echo "if [ \"x\${CMBENV_ROOT}\" = x ]; then" >> "${outinit}"
-echo "  source ${CMBENV_ROOT}/cmbenv_init.sh" >> "${outinit}"
-echo "fi" >> "${outinit}"
-echo "export PATH=\"${prefix}/bin\":\${PATH}" >> "${outinit}"
+    echo "# Source this file from a Bourne-compatible shell to load" > "${outinit}"
+    echo "# this sohpc installation into your environment:" >> "${outinit}"
+    echo "#" >> "${outinit}"
+    echo "#   %>  . path/to/sohpc_init.sh" >> "${outinit}"
+    echo "#" >> "${outinit}"
+    echo "# Then do \"source sohpc\" as usual." >> "${outinit}"
+    echo "#" >> "${outinit}"
+    echo "if [ \"x\${CMBENV_ROOT}\" = x ]; then" >> "${outinit}"
+    echo "  source ${CMBENV_ROOT}/cmbenv_init.sh" >> "${outinit}"
+    echo "fi" >> "${outinit}"
+    echo "export PATH=\"${prefix}/bin\":\${PATH}" >> "${outinit}"
+fi
