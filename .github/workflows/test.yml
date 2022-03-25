@@ -1,0 +1,37 @@
+# Test action that attempts to generate new docker containers on pull requests
+
+name:  CMBenv Docker Test
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    name: Docker Test ${{ matrix.mpi }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mpi: mpich
+          - mpi: openmpi
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create Dockerfile
+        run: ./sohpc_setup.sh -c docker-${{ matrix.mpi }}
+
+      - name: Build Docker Image
+        run: docker build -t simonsobs/sohpc-${{ matrix.mpi }}:temp -f Dockerfile_docker-${{ matrix.mpi }} .
+
+      - name: Test Docker Image
+        run: docker run -e "OMPI_ALLOW_RUN_AS_ROOT=1" -e "OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1" simonsobs/sohpc-${{ matrix.mpi }}:temp python -c 'import toast.tests; toast.tests.run()' && docker run -e "OMPI_ALLOW_RUN_AS_ROOT=1" -e "OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1" simonsobs/sohpc-${{ matrix.mpi }}:temp mpirun -np 2 python -c 'import toast.tests; toast.tests.run()'
+
+

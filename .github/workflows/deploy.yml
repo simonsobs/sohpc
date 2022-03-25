@@ -1,0 +1,50 @@
+# Deploy docker containers
+
+name:  Docker Deploy
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  deploy:
+    name: Docker Deploy ${{ matrix.mpi }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mpi: mpich
+          - mpi: openmpi
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create Dockerfile
+        run: ./sohpc_setup.sh -c docker-${{ matrix.mpi }}
+
+      - name: Set tag name
+        run: tag=$(echo "${GITHUB_REF}" | sed -e 's/refs\/tags\/\(.*\)/\1/') && echo "TAGNAME=${tag}" >> $GITHUB_ENV
+
+      - name: Build Docker Image
+        run: docker build -t simonsobs/sohpc-${{ matrix.mpi }}:${TAGNAME} -f Dockerfile_docker-${{ matrix.mpi }} .
+
+      - name: Test Docker Image
+        run: docker run simonsobs/sohpc-${{ matrix.mpi }}:${TAGNAME} python -c 'import so3g; from spt3g import core; import sotodlib; import toast'
+
+      - name: Tag Latest
+        run: docker tag simonsobs/sohpc-${{ matrix.mpi }}:${TAGNAME} simonsobs/sohpc-${{ matrix.mpi }}:latest
+
+      - name: Push Docker Image
+        run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin && docker push simonsobs/sohpc-${{ matrix.mpi }}:${TAGNAME} && docker push simonsobs/sohpc-${{ matrix.mpi }}:latest
+
