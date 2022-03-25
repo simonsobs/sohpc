@@ -20,6 +20,17 @@ fi
 
 echo "Building ${pkg}..." >&2
 
+blas=""
+blas_static="${CMBENV_AUX_ROOT}/lib/libopenblas.a"
+blas_shared="${CMBENV_AUX_ROOT}/lib/libopenblas.so"
+if [ -e ${blas_static} ]; then
+    blas="-DBLAS_LIBRARIES=\"${blas_static}\""
+else
+    if [ -e ${blas_shared} ]; then
+        blas="-DBLAS_LIBRARIES=\"${blas_shared}\""
+    fi
+fi
+
 rm -rf ${psrc}
 tar xzf ${fetched} \
     && cd ${psrc} \
@@ -32,8 +43,7 @@ tar xzf ${fetched} \
     -DCMAKE_C_FLAGS="@CFLAGS@" \
     -DCMAKE_CXX_FLAGS="@CXXFLAGS@" \
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
-    -DPYTHON_EXECUTABLE=$(which python3) \
-    -DBLAS_LIBRARIES="${CMBENV_AUX_ROOT}/lib/libopenblas.a" \
+    -DPYTHON_EXECUTABLE=$(which python3) ${blas} \
     -DCMAKE_INSTALL_PREFIX="@PREFIX@" \
     -DPYTHON_INSTALL_DEST="@PREFIX@/lib/python@PYVERSION@/site-packages" \
     .. > ${log} 2>&1 \
