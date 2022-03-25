@@ -24,10 +24,10 @@ blas=""
 blas_static="${CMBENV_AUX_ROOT}/lib/libopenblas.a"
 blas_shared="${CMBENV_AUX_ROOT}/lib/libopenblas.so"
 if [ -e ${blas_static} ]; then
-    blas="-DBLAS_LIBRARIES=\"${blas_static}\""
+    blas="-DBLAS_LIBRARIES=${blas_static}"
 else
     if [ -e ${blas_shared} ]; then
-        blas="-DBLAS_LIBRARIES=\"${blas_shared}\""
+        blas="-DBLAS_LIBRARIES=${blas_shared}"
     fi
 fi
 
