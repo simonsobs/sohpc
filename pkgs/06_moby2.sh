@@ -23,7 +23,8 @@ echo "Building ${pkg}..." >&2
 rm -rf ${psrc}
 tar xzf ${fetched} \
     && cd ${psrc} \
-    && python3 setup.py build > ${log} 2>&1 \
+    && patch -p1 < "@TOP_DIR@/pkgs/06_moby2.sh.patch" > ${log} 2>&1 \
+    && python3 setup.py build >> ${log} 2>&1 \
     && python3 setup.py install --prefix "@PREFIX@" >> ${log} 2>&1
 
 if [ $? -ne 0 ]; then

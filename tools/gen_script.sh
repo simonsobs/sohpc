@@ -75,7 +75,6 @@ confsub="${confsub} -e 's#@SRCDIR@#${topdir}#g'"
 confsub="${confsub} -e 's#@PREFIX@#${prefix}#g'"
 confsub="${confsub} -e 's#@VERSION@#${version}#g'"
 confsub="${confsub} -e 's#@MODULE_DIR@#${module_dir}#g'"
-confsub="${confsub} -e 's#@TOP_DIR@#${topdir}#g'"
 
 # If we are using docker, then the package scripts need to be able to find
 # the tools that we have copied into the container.
