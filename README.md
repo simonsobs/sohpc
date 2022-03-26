@@ -18,7 +18,7 @@ you are maintaining that installation.
 
 ## Docker Containers
 
-Each tag of this repo builds a docker container which can be found here.  **FIXME: currently hosted under tskisner, not simonsobs**.
+Each tag of this repo builds a docker container which can be found here.  **FIXME: currently hosted under hpc4cmb, not simonsobs**.
 
 | MPI Variant |       Container                                                  |
 |-------------|------------------------------------------------------------------|

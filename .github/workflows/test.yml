@@ -34,6 +34,8 @@ jobs:
         run: docker build -t simonsobs/sohpc-${{ matrix.mpi }}:temp -f Dockerfile_docker-${{ matrix.mpi }} .
 
       - name: Test Docker Image
-        run: docker run -e "OMPI_ALLOW_RUN_AS_ROOT=1" -e "OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1" simonsobs/sohpc-${{ matrix.mpi }}:temp python -c 'import toast.tests; toast.tests.run()' && docker run -e "OMPI_ALLOW_RUN_AS_ROOT=1" -e "OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1" simonsobs/sohpc-${{ matrix.mpi }}:temp mpirun -np 2 python -c 'import toast.tests; toast.tests.run()'
+        run: docker run simonsobs/sohpc-${{ matrix.mpi }}:temp python -c 'import so3g; from spt3g import core; import sotodlib; import toast'
 
+# FIXME:  The "test" above should run the sotodlib test suite, but that is
+# not bundled with the package.  We should change that...
 

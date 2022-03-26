@@ -37,14 +37,14 @@ jobs:
         run: tag=$(echo "${GITHUB_REF}" | sed -e 's/refs\/tags\/\(.*\)/\1/') && echo "TAGNAME=${tag}" >> $GITHUB_ENV
 
       - name: Build Docker Image
-        run: docker build -t tskisner/sohpc-${{ matrix.mpi }}:${TAGNAME} -f Dockerfile_docker-${{ matrix.mpi }} .
+        run: docker build -t hpc4cmb/sohpc-${{ matrix.mpi }}:${TAGNAME} -f Dockerfile_docker-${{ matrix.mpi }} .
 
       - name: Test Docker Image
-        run: docker run tskisner/sohpc-${{ matrix.mpi }}:${TAGNAME} python -c 'import so3g; from spt3g import core; import sotodlib; import toast'
+        run: docker run hpc4cmb/sohpc-${{ matrix.mpi }}:${TAGNAME} python -c 'import so3g; from spt3g import core; import sotodlib; import toast'
 
       - name: Tag Latest
-        run: docker tag tskisner/sohpc-${{ matrix.mpi }}:${TAGNAME} tskisner/sohpc-${{ matrix.mpi }}:latest
+        run: docker tag hpc4cmb/sohpc-${{ matrix.mpi }}:${TAGNAME} hpc4cmb/sohpc-${{ matrix.mpi }}:latest
 
       - name: Push Docker Image
-        run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin && docker push tskisner/sohpc-${{ matrix.mpi }}:${TAGNAME} && docker push tskisner/sohpc-${{ matrix.mpi }}:latest
+        run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin && docker push hpc4cmb/sohpc-${{ matrix.mpi }}:${TAGNAME} && docker push hpc4cmb/sohpc-${{ matrix.mpi }}:latest
 

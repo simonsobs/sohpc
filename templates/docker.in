@@ -33,6 +33,10 @@ COPY sohpc_setup.sh /home/cmbenv/
 
 @PACKAGES@
 
+# Run ldconfig
+
+RUN ldconfig
+
 # Precompile all python modules
 
 RUN python3 -m compileall -q "@PREFIX@/lib/python@PYVERSION@/site-packages" -x ".*jinja.*"
