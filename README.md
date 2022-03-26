@@ -9,30 +9,40 @@ If you are installing Simons Observatory tools on a laptop or workstation, and a
 not developing the `so3g` package or its dependencies, then it is likely easier to
 create a python virtualenv and use pip to install everything.
 
+If you just want to **use** already installed versions of this software (for
+example at NERSC or another center), then see the Simons Observatory wiki page
+for that system.
+
+The rest of this document describes how to build the software stack from source if
+you are maintaining that installation.
+
 ## Docker Containers
 
-Each tag of this repo builds a docker container which can be found here:
+Each tag of this repo builds a docker container which can be found here.  **FIXME: currently hosted under tskisner, not simonsobs**.
 
+| MPI Variant |       Container                                                  |
+|-------------|------------------------------------------------------------------|
+| MPICH       | https://hub.docker.com/repository/docker/simonsobs/sohpc-mpich   |
+| OpenMPI     | https://hub.docker.com/repository/docker/simonsobs/sohpc-openmpi |
 
 There are containers built with both MPICH and OpenMPI.  You should use the one
 which is compatible with the MPI version on your system.  Most HPC centers that
 support container solutions will inject / mount the system libraries (including
 MPI) into user containers when they are launched.  This makes it critical to
-use a container that includes an ABI compatible MPI implementation.  For example,
+use a container that includes an ABI-compatible MPI implementation.  For example,
 on the Cray systems at NERSC, you should use the MPICH flavor of the container when
-using shifter
-
+using the `shifter` container solution.
 
 ## Generate the Install Script
 
-Select (or create) an system config file in the `configs` directory.  Next, select where
+Select (or create) a system config file in the `configs` directory.  Next, select where
 you want to install all the packages and "version" to assign this overall installation
 (for example the current date).  Now generate the install script:
 
 ```bash
-./so_generate.sh \
+./sohpc_setup.sh \
 -c linux \
--p ${HOME}/simons_obs \
+-p ${HOME}/simonsobs \
 -v $(date +%Y%m%d)
 ```
 
@@ -42,23 +52,19 @@ you used in the configs directory).  Make a build directory and run it from ther
 ```bash
 mkdir build
 cd build
-../install_linux.sh
+../install_linux.sh | tee log
 ```
 
 ## Loading the Software
 
 Now you can load the environment with either a shell init file:
 ```bash
-source ${HOME}/simons_obs/so_env_init.sh
+source ${HOME}/simonsobs/sohpc_init.sh
 ```
 OR with modules
 ```bash
-module use ${HOME}/simons_obs/modulefiles
+module use ${HOME}/simonsobs/modulefiles
 module load sohpc
-```
-
-And finally, source the activation script:
-```bash
 source sohpc
 ```
 
