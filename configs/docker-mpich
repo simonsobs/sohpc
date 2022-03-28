@@ -2,6 +2,10 @@
 
 DOCKER_BASE = hpc4cmb/cmbenv-mpich:1.3.6
 
+# Python:  Must match the upstream cmbenv version!
+
+PYVERSION = 3.9
+
 # Serial compilers
 
 CC = gcc

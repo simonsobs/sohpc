@@ -31,10 +31,10 @@ jobs:
         run: ./sohpc_setup.sh -c docker-${{ matrix.mpi }}
 
       - name: Build Docker Image
-        run: docker build -t simonsobs/sohpc-${{ matrix.mpi }}:temp -f Dockerfile_docker-${{ matrix.mpi }} .
+        run: docker build -t hpc4cmb/sohpc-${{ matrix.mpi }}:temp -f Dockerfile_docker-${{ matrix.mpi }} .
 
       - name: Test Docker Image
-        run: docker run simonsobs/sohpc-${{ matrix.mpi }}:temp python -c 'import so3g; from spt3g import core; import sotodlib; import toast'
+        run: docker run hpc4cmb/sohpc-${{ matrix.mpi }}:temp python -c 'import so3g; from spt3g import core; import sotodlib; import toast.tests; toast.tests.run("env")'
 
 # FIXME:  The "test" above should run the sotodlib test suite, but that is
 # not bundled with the package.  We should change that...

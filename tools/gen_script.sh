@@ -47,9 +47,8 @@ mkdir -p "${outpkg}"
 confsub="-e 's#@CONFFILE@#${conffile}#g'"
 confsub="${confsub} -e 's#@CONFIG@#${config}#g'"
 
-# Get the major / minor python version
-pyver=$(python3 --version 2>&1 | awk '{print $2}' | sed -e "s#\(.*\)\.\(.*\)\..*#\1.\2#")
-confsub="${confsub} -e 's#@PYVERSION@#${pyver}#g'"
+found_pyversion="no"
+pyversion=""
 
 while IFS='' read -r line || [[ -n "${line}" ]]; do
     # is this line commented?
@@ -60,11 +59,27 @@ while IFS='' read -r line || [[ -n "${line}" ]]; do
             # get the variable and its value
             var=$(echo ${line} | sed -e "s#\([^=]*\)=.*#\1#" | awk '{print $1}')
             val=$(echo ${line} | sed -e "s#[^=]*= *\(.*\)#\1#")
-            # add to list of substitutions
-            confsub="${confsub} -e 's#@${var}@#${val}#g'"
+            if [ "${var}" = "PYVERSION" ]; then
+                if [ "x${val}" = "xauto" ]; then
+                    val=$(get_pyversion)
+                fi
+                pyversion="${val}"
+                found_pyversion="yes"
+            else
+                # add to list of substitutions
+                confsub="${confsub} -e 's#@${var}@#${val}#g'"
+            fi
         fi
     fi
 done < "${conffile}"
+
+# Get the major / minor python version.  This can be set in the config file, which
+# is needed in the case of docker containers (since we need that to build the
+# dockerfile).
+if [ "${found_pyversion}" = "no" ]; then
+    pyversion=$(python3 --version 2>&1 | awk '{print $2}' | sed -e "s#\(.*\)\.\(.*\)\..*#\1.\2#")
+fi
+confsub="${confsub} -e 's#@PYVERSION@#${pyversion}#g'"
 
 # We add these predefined matches at the end- so that the config
 # file can actually use these as well.
