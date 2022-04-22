@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pkg="sotodlib"
-version=89e865e172ee6720b63710ea15f2f644148ef11c
+version=517721e67edc3abf081fc045911664d9793fff66
 psrc=${pkg}-${version}
 pfile=${psrc}.tar.gz
 

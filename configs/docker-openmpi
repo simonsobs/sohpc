@@ -1,6 +1,6 @@
 # Specify the docker base image
 
-DOCKER_BASE = hpc4cmb/cmbenv-openmpi:1.3.6
+DOCKER_BASE = hpc4cmb/cmbenv-openmpi:1.3.7
 
 # Python:  Must match the upstream cmbenv version!
 
